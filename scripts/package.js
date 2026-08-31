@@ -17,7 +17,7 @@ if (fs.existsSync(zipPath)) {
   fs.unlinkSync(zipPath);
 }
 
-const itemsToPack = ['manifest.json', 'src', 'README.md', 'LICENSE'];
+const itemsToPack = ['manifest.json', 'assets', 'src', 'README.md', 'LICENSE'];
 
 console.log(`Packaging ${zipName}...`);
 

@@ -5,13 +5,14 @@ const assert = require('node:assert/strict');
 const vm = require('node:vm');
 const zlib = require('node:zlib');
 
-function loadWorker({ permissionLevel = 'granted', notificationError } = {}) {
+function loadWorker({ permissionLevel = 'granted', notificationError, notificationErrors = [] } = {}) {
   const listeners = {};
   const stored = {};
   const notifications = [];
   const chrome = {
     runtime: {
       lastError: undefined,
+      getURL(resourcePath) { return `chrome-extension://test-extension/${resourcePath}`; },
       onInstalled: { addListener(listener) { listeners.installed = listener; } },
       onMessage: { addListener(listener) { listeners.message = listener; } },
     },
@@ -24,7 +25,8 @@ function loadWorker({ permissionLevel = 'granted', notificationError } = {}) {
     notifications: {
       create(id, options, callback) {
         notifications.push({ id, options });
-        chrome.runtime.lastError = notificationError ? { message: notificationError } : undefined;
+        const error = notificationErrors.length ? notificationErrors.shift() : notificationError;
+        chrome.runtime.lastError = error ? { message: error } : undefined;
         callback();
         chrome.runtime.lastError = undefined;
       },
@@ -66,11 +68,12 @@ test('records a successful test-notification diagnostic', () => {
   assert.equal(worker.stored.notificationDiagnostic.state, 'sent');
 });
 
-test('uses a decodable local PNG as the required notification icon', () => {
+test('uses the project blue-white PNG as the notification icon', () => {
   const worker = loadWorker();
   worker.listeners.message({ type: 'test-notification' }, {}, () => {});
   const iconUrl = worker.notifications[0].options.iconUrl;
-  const image = Buffer.from(iconUrl.replace('data:image/png;base64,', ''), 'base64');
+  assert.equal(iconUrl, 'chrome-extension://test-extension/assets/notification-icon-128.png');
+  const image = fs.readFileSync(path.join(__dirname, '../assets/notification-icon-128.png'));
   let cursor = 8;
   const idatChunks = [];
 
@@ -82,4 +85,16 @@ test('uses a decodable local PNG as the required notification icon', () => {
   }
 
   assert.doesNotThrow(() => zlib.inflateSync(Buffer.concat(idatChunks)));
+});
+
+test('retries with the embedded placeholder when Chrome cannot load the project icon', () => {
+  const worker = loadWorker({ notificationErrors: ['Unable to download all specified images.'] });
+  let response;
+
+  worker.listeners.message({ type: 'test-notification' }, {}, (value) => { response = value; });
+
+  assert.equal(response.ok, true);
+  assert.equal(worker.notifications.length, 2);
+  assert.match(worker.notifications[1].options.iconUrl, /^data:image\/png;base64,/);
+  assert.equal(worker.stored.notificationDiagnostic.state, 'sent');
 });

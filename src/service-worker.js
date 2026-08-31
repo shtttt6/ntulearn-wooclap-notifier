@@ -1,4 +1,5 @@
-const NOTIFICATION_ICON = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNQTX79HwAElwJzVt2vfAAAAABJRU5ErkJggg==';
+const NOTIFICATION_ICON_PATH = 'assets/notification-icon-128.png';
+const FALLBACK_NOTIFICATION_ICON = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNQTX79HwAElwJzVt2vfAAAAABJRU5ErkJggg==';
 const notificationSources = new Map();
 const EMPTY_MONITOR_STATUS = {
   summary: '尚未读取到 WOOCLAP 内容。',
@@ -22,17 +23,19 @@ function saveDiagnostic(state, message) {
   });
 }
 
-function showNotification(tabId, isTest, done) {
-  const notificationId = `wooclap-${Date.now()}`;
-  if (Number.isInteger(tabId)) notificationSources.set(notificationId, tabId);
+function createNotification(notificationId, iconUrl, isTest, done, isFallback = false) {
   chrome.notifications.create(notificationId, {
     type: 'basic',
-    iconUrl: NOTIFICATION_ICON,
+    iconUrl,
     title: isTest ? 'WOOCLAP 通知测试' : 'WOOCLAP 有新题目',
     message: isTest ? 'Windows 通知工作正常。' : '打开 WOOCLAP 标签页查看并作答。',
     priority: 0,
   }, () => {
     const error = chrome.runtime.lastError?.message;
+    if (error && !isFallback) {
+      createNotification(notificationId, FALLBACK_NOTIFICATION_ICON, isTest, done, true);
+      return;
+    }
     if (error) {
       saveDiagnostic('failed', error);
       done?.({ ok: false, message: error });
@@ -41,6 +44,12 @@ function showNotification(tabId, isTest, done) {
     saveDiagnostic('sent', isTest ? '测试通知已交给 Windows。' : '新题通知已交给 Windows。');
     done?.({ ok: true });
   });
+}
+
+function showNotification(tabId, isTest, done) {
+  const notificationId = `wooclap-${Date.now()}`;
+  if (Number.isInteger(tabId)) notificationSources.set(notificationId, tabId);
+  createNotification(notificationId, chrome.runtime.getURL(NOTIFICATION_ICON_PATH), isTest, done);
 }
 
 function getPopupStatus(done) {

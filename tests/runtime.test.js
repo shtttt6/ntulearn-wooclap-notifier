@@ -17,6 +17,20 @@ test('manifest exposes the monitoring controls in an action popup', () => {
   assert.equal(manifest.action.default_popup, 'src/popup.html');
 });
 
+test('manifest uses the blue-white icon for the extension and toolbar', () => {
+  delete require.cache[require.resolve('../manifest.json')];
+  const manifest = require('../manifest.json');
+  const iconPath = 'assets/ntulearn-wooclap-notifier-icon-blue-white.png';
+
+  assert.deepEqual(manifest.icons, {
+    16: iconPath,
+    32: iconPath,
+    48: iconPath,
+    128: iconPath,
+  });
+  assert.deepEqual(manifest.action.default_icon, manifest.icons);
+});
+
 test('manifest uses the product name NTULearn WOOCLAP Notifier', () => {
   delete require.cache[require.resolve('../manifest.json')];
   const manifest = require('../manifest.json');

@@ -6,6 +6,12 @@
   "minimum_chrome_version": "88",
   "permissions": ["notifications", "storage", "tabs"],
   "host_permissions": ["https://app.wooclap.com/*"],
+  "icons": {
+    "16": "assets/ntulearn-wooclap-notifier-icon-blue-white.png",
+    "32": "assets/ntulearn-wooclap-notifier-icon-blue-white.png",
+    "48": "assets/ntulearn-wooclap-notifier-icon-blue-white.png",
+    "128": "assets/ntulearn-wooclap-notifier-icon-blue-white.png"
+  },
   "background": {
     "service_worker": "src/service-worker.js"
   },
@@ -19,6 +25,12 @@
   ],
   "action": {
     "default_title": "NTULearn WOOCLAP Notifier",
-    "default_popup": "src/popup.html"
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "16": "assets/ntulearn-wooclap-notifier-icon-blue-white.png",
+      "32": "assets/ntulearn-wooclap-notifier-icon-blue-white.png",
+      "48": "assets/ntulearn-wooclap-notifier-icon-blue-white.png",
+      "128": "assets/ntulearn-wooclap-notifier-icon-blue-white.png"
+    }
   }
 }
