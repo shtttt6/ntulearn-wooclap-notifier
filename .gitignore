@@ -1,0 +1,48 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE, Editor & AI Configurations
+.idea/
+.vscode/
+.cursor/
+.windsurf/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Node & Package Managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs & Temporary Files
+*.log
+*.tmp
+*.temp
+.cache/
+coverage/
+.nyc_output/
+
+# Builds, Releases and Archives
+dist/
+build/
+*.zip
+*.crx
+
+# AI Planning & Workspace Artifacts
+docs/superpowers/
+.superpowers/

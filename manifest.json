@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "NTULearn WOOCLAP Notifier",
+  "version": "1.0.0",
+  "description": "Notifies you when an open WOOCLAP session shows a new answerable question.",
+  "minimum_chrome_version": "88",
+  "permissions": ["notifications", "storage", "tabs"],
+  "host_permissions": ["https://app.wooclap.com/*"],
+  "background": {
+    "service_worker": "src/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://app.wooclap.com/*"],
+      "all_frames": true,
+      "run_at": "document_idle",
+      "js": ["src/detector-core.js", "src/content-script.js"]
+    }
+  ],
+  "action": {
+    "default_title": "NTULearn WOOCLAP Notifier",
+    "default_popup": "src/popup.html"
+  }
+}

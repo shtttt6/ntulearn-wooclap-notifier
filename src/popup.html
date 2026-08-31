@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NTULearn WOOCLAP Notifier</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>NTULearn WOOCLAP</h1>
+        <p id="monitor-state" class="monitor-state" aria-live="polite">读取中</p>
+      </header>
+      <section class="content-card">
+        <span>当前内容</span>
+        <p id="monitor-content" class="content-preview">—</p>
+      </section>
+      <div class="controls">
+        <label class="toggle-row" for="enabled">
+          <span>新题通知</span>
+          <input id="enabled" type="checkbox">
+        </label>
+        <button id="test-notification" type="button">测试</button>
+      </div>
+      <p id="notification-result" class="error-message hidden" aria-live="polite"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

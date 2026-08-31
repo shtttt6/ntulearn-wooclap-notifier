@@ -1,0 +1,105 @@
+:root {
+  color: #1e293b;
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  min-width: 295px;
+  background: #f8fafc;
+}
+
+main {
+  padding: 14px;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  gap: 7px;
+  font-weight: 600;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2563eb;
+}
+
+button {
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.monitor-state {
+  margin: 0;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.content-card {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.content-card > span {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.content-preview {
+  margin: 3px 0 0;
+  overflow-wrap: anywhere;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.error-message {
+  margin: 8px 0 0;
+  color: #b91c1c;
+  font-size: 12px;
+}
+
+.hidden {
+  display: none;
+}
