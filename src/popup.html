@@ -21,7 +21,11 @@
           <span>新题通知</span>
           <input id="enabled" type="checkbox">
         </label>
-        <button id="test-notification" type="button">测试</button>
+      </div>
+      <div class="test-row">
+        <button id="test-notification" type="button" data-test="test-notification">测试系统通知</button>
+        <button id="test-ntfy" type="button" data-test="test-ntfy" class="secondary">测试 ntfy</button>
+        <button id="test-bark" type="button" data-test="test-bark" class="secondary">测试 Bark</button>
       </div>
       <button id="ntfy-toggle" type="button" class="ntfy-toggle" aria-expanded="false" aria-controls="ntfy-settings">手机推送（ntfy）▸</button>
       <section id="ntfy-settings" class="ntfy-card hidden">

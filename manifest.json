@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "NTULearn WOOCLAP Notifier",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Notifies you when an open WOOCLAP session shows a new answerable question.",
   "minimum_chrome_version": "88",
   "permissions": ["notifications", "storage", "tabs"],

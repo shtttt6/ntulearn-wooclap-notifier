@@ -50,6 +50,16 @@ button {
   font-weight: 600;
 }
 
+button.secondary {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  color: #1d4ed8;
+}
+
+button.secondary:hover {
+  background: #eff6ff;
+}
+
 button:hover {
   background: #1d4ed8;
 }
@@ -92,6 +102,18 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   margin-top: 10px;
+}
+
+.test-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.test-row button {
+  flex: 1;
+  padding: 7px 4px;
+  font-size: 12px;
 }
 
 .ntfy-toggle {

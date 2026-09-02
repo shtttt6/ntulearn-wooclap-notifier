@@ -132,33 +132,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: false, message: messageText });
         return;
       }
-      chrome.storage.local.get({ ntfyTopic: '', ntfyServer: '', ntfyUser: '', ntfyPass: '', barkKey: '', barkServer: '' }, (settings) => {
-        showNotification(undefined, true, (result) => {
-          const messages = [result.message];
-          let ok = result.ok;
-          let pending = 1;
-          const finish = () => {
-            if (--pending === 0) sendResponse({ ok, message: messages.filter(Boolean).join('；') });
-          };
-          if (settings.ntfyTopic.trim()) {
-            pending++;
-            sendNtfyPush(settings, NTFY_TEST_PUSH, (push) => {
-              ok = ok && push.ok;
-              messages.push(push.message);
-              finish();
-            });
-          }
-          if (settings.barkKey.trim()) {
-            pending++;
-            sendBarkPush(settings, BARK_TEST_PUSH, (push) => {
-              ok = ok && push.ok;
-              messages.push(push.message);
-              finish();
-            });
-          }
-          finish();
-        });
-      });
+      showNotification(undefined, true, sendResponse);
+    });
+    return true;
+  }
+
+  if (message?.type === 'test-ntfy') {
+    chrome.storage.local.get({ ntfyTopic: '', ntfyServer: '', ntfyUser: '', ntfyPass: '' }, (settings) => {
+      if (!settings.ntfyTopic.trim()) {
+        sendResponse({ ok: false, message: '尚未配置 ntfy 频道。' });
+        return;
+      }
+      sendNtfyPush(settings, NTFY_TEST_PUSH, sendResponse);
+    });
+    return true;
+  }
+
+  if (message?.type === 'test-bark') {
+    chrome.storage.local.get({ barkKey: '', barkServer: '' }, (settings) => {
+      if (!settings.barkKey.trim()) {
+        sendResponse({ ok: false, message: '尚未配置 Bark。' });
+        return;
+      }
+      sendBarkPush(settings, BARK_TEST_PUSH, sendResponse);
     });
     return true;
   }

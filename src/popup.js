@@ -1,5 +1,4 @@
 const enabledInput = document.querySelector('#enabled');
-const testButton = document.querySelector('#test-notification');
 const ntfyServerInput = document.querySelector('#ntfy-server');
 const ntfyTopicInput = document.querySelector('#ntfy-topic');
 const ntfyUserInput = document.querySelector('#ntfy-user');
@@ -97,18 +96,20 @@ async function ensureNtfyServerPermission(serverUrl) {
   }
 }
 
-testButton.addEventListener('click', () => {
-  testButton.disabled = true;
-  chrome.runtime.sendMessage({ type: 'test-notification' }, (result) => {
-    testButton.disabled = false;
-    if (chrome.runtime.lastError) {
-      showError(chrome.runtime.lastError.message);
-    } else if (result?.message) {
-      showError(result.message);
-    }
-    loadState();
+for (const button of document.querySelectorAll('[data-test]')) {
+  button.addEventListener('click', () => {
+    button.disabled = true;
+    chrome.runtime.sendMessage({ type: button.dataset.test }, (result) => {
+      button.disabled = false;
+      if (chrome.runtime.lastError) {
+        showError(chrome.runtime.lastError.message);
+      } else if (result?.message) {
+        showError(result.message);
+      }
+      loadState();
+    });
   });
-});
+}
 
 loadState();
 setInterval(loadState, 1000);
