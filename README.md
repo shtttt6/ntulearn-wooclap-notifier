@@ -84,24 +84,40 @@ cd ntulearn-wooclap-notifier
 
 ## 📱 手机推送（可选）
 
-扩展支持把新题通知同步推送到手机，内置两个通道，任选或同时使用：
+扩展支持把新题通知同步推送到手机，内置 **Bark** 和 **ntfy** 两个通道，可以只用其中一个，也可以同时开启（新题到达时两个都会发）。
 
-### Bark（iPhone 推荐，免代理）
+> [!TIP]
+> **iPhone 用户直接选 Bark**：国内直连、不需要任何代理、配置只需粘贴一条 URL。ntfy 的 iOS 实时推送受苹果机制限制，自建服务器场景下还要额外解决网络问题（见下文"常见问题"），除非你本身就有自建 ntfy 服务器的需求，否则没必要。
 
-1. iPhone 安装 [Bark](https://apps.apple.com/app/bark-customed-notifications/id1403753865)（免费开源，走其官方 APNs 通道，国内直连）。
-2. 打开 Bark，把首页显示的**整条 URL**（形如 `https://api.day.app/<DeviceKey>/…`）直接复制。
-3. 在扩展弹窗 → “手机推送” 面板中，把整条 URL 粘贴进 **“Bark 推送”** 栏（自动提取 Key；自建 Bark 服务器地址也会一并识别），留空则关闭。
-4. 点“测试”确认手机收到横幅。
+### Bark 配置（iPhone，推荐）
 
-### ntfy（Android / iOS / 网页，支持自建）
+1. iPhone 在 App Store 安装 [Bark](https://apps.apple.com/app/bark-customed-notifications/id1403753865)（免费开源）。
+2. 首次打开时**务必允许系统通知授权**（可在 设置 → 通知 → Bark 中检查）。
+3. 打开 Bark 首页，会看到一条示例 URL，形如 `https://api.day.app/<DeviceKey>/这里改成你的推送内容`，**把整条 URL 复制**。
+4. 在扩展弹窗 → "手机推送"面板 → **Bark** 卡片中粘贴这条 URL（整条粘贴即可，扩展会自动提取其中的 Device Key），点击 **保存**。
+5. 点击弹窗中的 **测试 Bark** 按钮，手机锁屏状态下应立即弹出横幅。
 
-1. 在手机上安装 ntfy App（[Android](https://play.google.com/store/apps/details?id=io.heckel.ntfy) / [iOS](https://apps.apple.com/us/app/ntfy/id1625396347)），也可以访问网页端订阅。
-2. 在 App 中**订阅一个自定义频道**（Topic），频道名只允许字母、数字、`-`、`_`，例如 `wooclap-8k2m9x`。**频道名等同于密码**，请使用不易猜测的名字并妥善保管。
-3. 在扩展弹窗的“手机推送”面板中填入频道名；使用自建服务器时，把“ntfy 服务器地址”改为你的实例地址（Chrome 会弹窗请求访问授权，允许即可），开启 `auth-default-access: deny-all` 的自建服务器还需填写账号密码；服务器地址留空则使用官方 ntfy.sh。
-4. 点“测试”按钮，手机应同步收到推送。
+原理说明：Bark 走其官方服务器（`api.day.app`，国内可直连）中转苹果 APNs，因此**不依赖任何代理**，电脑上的代理软件开不开都不影响。推送内容为固定文案（"WOOCLAP 有新题目"），不包含课程、题目或页面内容。进阶用户也可以自建 [bark-server](https://github.com/finb/bark-server)，把自建地址的整条 URL 粘入即可（扩展会自动识别服务器地址）。
 
-> [!NOTE]
-> iPhone 上的 ntfy 实时推送需要自建服务器能访问 ntfy.sh（APNs 中转，配置 `upstream-base-url`）；不具备条件时建议使用 Bark。推送内容均为固定文案（“WOOCLAP 有新题目”），**不包含任何课程、题目或页面内容**。
+### ntfy 配置（Android / iOS / 网页，支持自建）
+
+1. 在手机上安装 ntfy App（[Android](https://play.google.com/store/apps/details?id=io.heckel.ntfy) / [iOS](https://apps.apple.com/us/app/ntfy/id1625396347)），或使用网页端订阅。
+2. 在 App 中**订阅一个自定义频道**（Topic）。频道名只允许字母、数字、`-`、`_`（如 `wooclap-8k2m9x`）。**在公开服务器上，频道名等同于密码**，请使用不易猜测的名字。
+3. 在扩展弹窗 → "手机推送"面板 → **ntfy** 卡片中填写：
+   - **服务器地址**：使用官方 ntfy.sh 则留空；自建服务器填实例地址（如 `http://192.168.x.x:8080`），保存时会弹出 Chrome 访问授权，选择允许；
+   - **频道（Topic）**：与手机 App 订阅的相同；
+   - **账号 / 密码**：自建服务器开启 `auth-default-access: deny-all` 时必填，官方 ntfy.sh 留空。
+4. 点击 **保存**，再点弹窗中的 **测试 ntfy** 按钮验证。
+
+### ntfy 常见问题
+
+- **iPhone 收到了消息但要手动刷新才显示**：这是 iOS 平台限制——App 退后台即被系统冻结，横幅通知必须经苹果 APNs 投递，而 APNs 推送必须由持有 ntfy App 推送凭证的 ntfy.sh 官方服务器代发。因此**自建服务器必须能访问 `https://ntfy.sh`**（在 `server.yml` 配置 `upstream-base-url: "https://ntfy.sh"`；转发给上游的只有消息 ID 和 topic 哈希，内容不外泄）。若你的网络访问不了 ntfy.sh（国内网络通常如此），需要让服务器走代理，并在手机 App 中删除订阅后重新添加一次以重注册推送通道。无法满足条件时，iPhone 请改用 Bark。
+- **Android 收不到或延迟**：在 ntfy App 中对该订阅开启**即时交付（Instant delivery）**，并在系统设置中把 ntfy 的电池优化设为"不限制"。
+- **点"测试 ntfy"提示"尚未配置 ntfy 频道"**：频道名没有保存，填好后记得点 **保存**。
+- **提示"未授权扩展访问 …"**：自建服务器地址保存时的 Chrome 授权弹窗被拒绝过，到 `chrome://extensions` → 本扩展 → 详情 → 网站访问权限 中重新允许。
+- **更换了服务器地址 / 端口**：重新填入并保存（会再次弹授权），手机 App 端同步修改 Default server。
+- **自建服务器认证失败**：检查账号密码是否与服务器用户库一致（`ntfy user` 命令或管理面板可查）。
+- **推送内容会泄露课程信息吗**：不会。两个通道都只发送固定文案（"WOOCLAP 有新题目"），**不包含任何课程、题目或页面内容**。
 
 ---
 
