@@ -5,12 +5,12 @@
 
 body {
   margin: 0;
-  min-width: 295px;
+  min-width: 320px;
   background: #f8fafc;
 }
 
 main {
-  padding: 14px;
+  padding: 16px;
 }
 
 header {
@@ -105,8 +105,8 @@ button:disabled {
 }
 
 .content-card {
-  margin-top: 12px;
-  padding: 10px;
+  margin-top: 14px;
+  padding: 12px;
   border: 1px solid #dbeafe;
   border-radius: 8px;
   background: #fff;
@@ -129,26 +129,26 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: 14px;
 }
 
 .test-row {
   display: flex;
-  gap: 6px;
-  margin-top: 10px;
+  gap: 8px;
+  margin-top: 14px;
 }
 
 .test-row button {
   flex: 1;
-  padding: 7px 4px;
+  padding: 8px 4px;
   font-size: 12px;
 }
 
 .ntfy-toggle {
   display: block;
   width: 100%;
-  margin-top: 10px;
-  padding: 7px 12px;
+  margin-top: 14px;
+  padding: 8px 12px;
   border-radius: 7px;
   background: #fff;
   border: 1px solid #dbeafe;
@@ -161,15 +161,15 @@ button:disabled {
 }
 
 .push-card {
-  margin-top: 8px;
-  padding: 10px;
+  margin-top: 10px;
+  padding: 12px;
   border: 1px solid #dbeafe;
   border-radius: 8px;
   background: #fff;
 }
 
 .push-card h2 {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   color: #0f172a;
   font-size: 13px;
 }
@@ -183,7 +183,7 @@ button:disabled {
 
 .push-card label {
   display: block;
-  margin-top: 8px;
+  margin-top: 10px;
   color: #64748b;
   font-size: 11px;
   font-weight: 700;
@@ -192,8 +192,8 @@ button:disabled {
 .push-card input[type="text"],
 .push-card input[type="password"] {
   width: 100%;
-  margin-top: 5px;
-  padding: 6px 8px;
+  margin-top: 6px;
+  padding: 7px 9px;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   box-sizing: border-box;
@@ -204,7 +204,7 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .save-row button {
@@ -219,7 +219,7 @@ button:disabled {
 }
 
 .push-card p {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   color: #64748b;
   font-size: 11px;
 }

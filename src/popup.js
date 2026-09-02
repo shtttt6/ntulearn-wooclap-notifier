@@ -47,7 +47,7 @@ function loadState() {
       showError('请重新加载扩展');
       return;
     }
-    enabledInput.checked = status.enabled;
+    enabledInput.checked = status.enabled !== false;
     monitorState.textContent = status.monitorStatus.isQuestion ? '发现新题' : '监测中';
     monitorState.dataset.question = String(status.monitorStatus.isQuestion);
     monitorContent.textContent = status.monitorStatus.summary;
