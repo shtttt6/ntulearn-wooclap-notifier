@@ -1,4 +1,8 @@
+importScripts('ntfy-core.js');
+
 const NOTIFICATION_ICON_PATH = 'assets/notification-icon-128.png';
+const NTFY_PUSH = { title: 'WOOCLAP 有新题目', message: '打开 WOOCLAP 页面查看并作答。' };
+const NTFY_TEST_PUSH = { title: 'WOOCLAP 测试推送', message: 'ntfy 手机推送工作正常。' };
 const FALLBACK_NOTIFICATION_ICON = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNQTX79HwAElwJzVt2vfAAAAABJRU5ErkJggg==';
 const notificationSources = new Map();
 const EMPTY_MONITOR_STATUS = {
@@ -28,7 +32,7 @@ function createNotification(notificationId, iconUrl, isTest, done, isFallback = 
     type: 'basic',
     iconUrl,
     title: isTest ? 'WOOCLAP 通知测试' : 'WOOCLAP 有新题目',
-    message: isTest ? 'Windows 通知工作正常。' : '打开 WOOCLAP 标签页查看并作答。',
+    message: isTest ? '系统通知工作正常。' : '打开 WOOCLAP 标签页查看并作答。',
     priority: 0,
   }, () => {
     const error = chrome.runtime.lastError?.message;
@@ -41,9 +45,25 @@ function createNotification(notificationId, iconUrl, isTest, done, isFallback = 
       done?.({ ok: false, message: error });
       return;
     }
-    saveDiagnostic('sent', isTest ? '测试通知已交给 Windows。' : '新题通知已交给 Windows。');
+    saveDiagnostic('sent', isTest ? '测试通知已交给系统通知服务。' : '新题通知已交给系统通知服务。');
     done?.({ ok: true });
   });
+}
+
+function sendNtfyPush(topic, { title, message }, done) {
+  const request = globalThis.WooclapNtfyCore.buildNtfyRequest({ topic, title, message });
+  if (!request) {
+    done?.({ ok: false, message: 'ntfy 频道名无效，只能包含字母、数字、下划线和中划线。' });
+    return;
+  }
+  fetch(request.url, request.options)
+    .then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      done?.({ ok: true });
+    })
+    .catch((error) => {
+      done?.({ ok: false, message: `ntfy 推送失败：${error.message}` });
+    });
 }
 
 function showNotification(tabId, isTest, done) {
@@ -66,8 +86,10 @@ function getPopupStatus(done) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'new-question') {
-    chrome.storage.local.get({ enabled: true }, ({ enabled }) => {
-      if (enabled) showNotification(sender.tab?.id, false);
+    chrome.storage.local.get({ enabled: true, ntfyTopic: '' }, ({ enabled, ntfyTopic }) => {
+      if (!enabled) return;
+      showNotification(sender.tab?.id, false);
+      if (ntfyTopic.trim()) sendNtfyPush(ntfyTopic, NTFY_PUSH);
     });
   }
 
@@ -90,7 +112,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: false, message: messageText });
         return;
       }
-      showNotification(undefined, true, sendResponse);
+      chrome.storage.local.get({ ntfyTopic: '' }, ({ ntfyTopic }) => {
+        showNotification(undefined, true, (result) => {
+          if (!ntfyTopic.trim()) {
+            sendResponse(result);
+            return;
+          }
+          sendNtfyPush(ntfyTopic, NTFY_TEST_PUSH, (push) => {
+            sendResponse({
+              ok: result.ok && push.ok,
+              message: [result.message, push.message].filter(Boolean).join('；'),
+            });
+          });
+        });
+      });
     });
     return true;
   }

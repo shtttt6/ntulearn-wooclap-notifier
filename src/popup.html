@@ -23,6 +23,11 @@
         </label>
         <button id="test-notification" type="button">测试</button>
       </div>
+      <section class="ntfy-card">
+        <label for="ntfy-topic">手机推送频道（ntfy）</label>
+        <input id="ntfy-topic" type="text" placeholder="如 wooclap-8k2m9x" autocomplete="off" spellcheck="false">
+        <p>手机安装 ntfy App 并订阅同名频道即可同步收到推送；留空则关闭。频道名等同于密码，请勿外传。</p>
+      </section>
       <p id="notification-result" class="error-message hidden" aria-live="polite"></p>
     </main>
     <script src="popup.js"></script>

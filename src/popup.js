@@ -1,5 +1,6 @@
 const enabledInput = document.querySelector('#enabled');
 const testButton = document.querySelector('#test-notification');
+const ntfyTopicInput = document.querySelector('#ntfy-topic');
 const monitorState = document.querySelector('#monitor-state');
 const monitorContent = document.querySelector('#monitor-content');
 const notificationResult = document.querySelector('#notification-result');
@@ -34,6 +35,14 @@ function loadState() {
 
 enabledInput.addEventListener('change', () => {
   chrome.storage.local.set({ enabled: enabledInput.checked });
+});
+
+chrome.storage.local.get({ ntfyTopic: '' }, ({ ntfyTopic }) => {
+  ntfyTopicInput.value = ntfyTopic;
+});
+
+ntfyTopicInput.addEventListener('change', () => {
+  chrome.storage.local.set({ ntfyTopic: ntfyTopicInput.value.trim() });
 });
 
 testButton.addEventListener('click', () => {
