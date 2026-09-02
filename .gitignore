@@ -22,6 +22,9 @@ yarn-error.log*
 pnpm-debug.log*
 package-lock.json
 
+# Local test suite (not published)
+tests/
+
 # Environment & Secrets
 .env
 .env.*

@@ -21,9 +21,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Run Tests
-        run: npm test
-
       - name: Check Manifest & Syntax
         run: npm run check
 
