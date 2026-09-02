@@ -132,7 +132,7 @@ button:disabled {
   background: #eff6ff;
 }
 
-.ntfy-card {
+.push-card {
   margin-top: 8px;
   padding: 10px;
   border: 1px solid #dbeafe;
@@ -140,7 +140,20 @@ button:disabled {
   background: #fff;
 }
 
-.ntfy-card label {
+.push-card h2 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.push-card h2 small {
+  margin-left: 4px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.push-card label {
   display: block;
   margin-top: 8px;
   color: #64748b;
@@ -148,11 +161,8 @@ button:disabled {
   font-weight: 700;
 }
 
-.ntfy-card label:first-child {
-  margin-top: 0;
-}
-
-.ntfy-card input[type="text"] {
+.push-card input[type="text"],
+.push-card input[type="password"] {
   width: 100%;
   margin-top: 5px;
   padding: 6px 8px;
@@ -162,7 +172,25 @@ button:disabled {
   font: inherit;
 }
 
-.ntfy-card p {
+.save-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.save-row button {
+  padding: 5px 14px;
+  font-size: 12px;
+}
+
+.save-status {
+  color: #166534;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.push-card p {
   margin: 6px 0 0;
   color: #64748b;
   font-size: 11px;

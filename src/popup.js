@@ -1,14 +1,27 @@
 const enabledInput = document.querySelector('#enabled');
-const ntfyServerInput = document.querySelector('#ntfy-server');
-const ntfyTopicInput = document.querySelector('#ntfy-topic');
-const ntfyUserInput = document.querySelector('#ntfy-user');
-const ntfyPassInput = document.querySelector('#ntfy-pass');
-const barkKeyInput = document.querySelector('#bark-key');
-const ntfyToggle = document.querySelector('#ntfy-toggle');
-const ntfySettings = document.querySelector('#ntfy-settings');
 const monitorState = document.querySelector('#monitor-state');
 const monitorContent = document.querySelector('#monitor-content');
 const notificationResult = document.querySelector('#notification-result');
+const phoneToggle = document.querySelector('#phone-toggle');
+const phoneSettings = document.querySelector('#phone-settings');
+
+const FIELDS = {
+  bark: {
+    inputs: { barkKey: '#bark-key' },
+    status: '#bark-status',
+    savedText: 'Bark 配置已保存',
+  },
+  ntfy: {
+    inputs: {
+      ntfyServer: '#ntfy-server',
+      ntfyTopic: '#ntfy-topic',
+      ntfyUser: '#ntfy-user',
+      ntfyPass: '#ntfy-pass',
+    },
+    status: '#ntfy-status',
+    savedText: 'ntfy 配置已保存',
+  },
+};
 
 function showError(message) {
   notificationResult.textContent = message;
@@ -18,6 +31,14 @@ function showError(message) {
 function clearError() {
   notificationResult.textContent = '';
   notificationResult.classList.add('hidden');
+}
+
+function showSavedStatus(channel) {
+  const status = document.querySelector(FIELDS[channel].status);
+  status.textContent = FIELDS[channel].savedText;
+  setTimeout(() => {
+    status.textContent = '';
+  }, 2500);
 }
 
 function loadState() {
@@ -38,41 +59,19 @@ function loadState() {
   });
 }
 
-enabledInput.addEventListener('change', () => {
-  chrome.storage.local.set({ enabled: enabledInput.checked });
-});
-
-chrome.storage.local.get({ ntfyTopic: '', ntfyServer: '', ntfyUser: '', ntfyPass: '', barkKey: '' }, (settings) => {
-  ntfyTopicInput.value = settings.ntfyTopic;
-  ntfyServerInput.value = settings.ntfyServer;
-  ntfyUserInput.value = settings.ntfyUser;
-  ntfyPassInput.value = settings.ntfyPass;
-  barkKeyInput.value = settings.barkKey;
-});
-
-const ntfyFields = [
-  ['#ntfy-topic', 'ntfyTopic'],
-  ['#ntfy-user', 'ntfyUser'],
-  ['#ntfy-pass', 'ntfyPass'],
-  ['#bark-key', 'barkKey'],
-];
-for (const [selector, key] of ntfyFields) {
-  document.querySelector(selector).addEventListener('change', (event) => {
-    chrome.storage.local.set({ [key]: event.target.value.trim() });
+function loadPushSettings() {
+  const defaults = {};
+  for (const { inputs } of Object.values(FIELDS)) {
+    for (const key of Object.keys(inputs)) defaults[key] = '';
+  }
+  chrome.storage.local.get(defaults, (stored) => {
+    for (const { inputs } of Object.values(FIELDS)) {
+      for (const [key, selector] of Object.entries(inputs)) {
+        document.querySelector(selector).value = stored[key];
+      }
+    }
   });
 }
-
-ntfyToggle.addEventListener('click', () => {
-  const expanded = ntfySettings.classList.toggle('hidden') === false;
-  ntfyToggle.setAttribute('aria-expanded', String(expanded));
-  ntfyToggle.textContent = expanded ? '手机推送（ntfy）▾' : '手机推送（ntfy）▸';
-});
-
-ntfyServerInput.addEventListener('change', async (event) => {
-  const serverUrl = event.target.value.trim();
-  chrome.storage.local.set({ ntfyServer: serverUrl });
-  await ensureNtfyServerPermission(serverUrl);
-});
 
 async function ensureNtfyServerPermission(serverUrl) {
   let originPattern;
@@ -96,6 +95,30 @@ async function ensureNtfyServerPermission(serverUrl) {
   }
 }
 
+enabledInput.addEventListener('change', () => {
+  chrome.storage.local.set({ enabled: enabledInput.checked });
+});
+
+phoneToggle.addEventListener('click', () => {
+  const expanded = phoneSettings.classList.toggle('hidden') === false;
+  phoneToggle.setAttribute('aria-expanded', String(expanded));
+  phoneToggle.textContent = expanded ? '手机推送（Bark / ntfy）▾' : '手机推送（Bark / ntfy）▸';
+});
+
+for (const [channel, config] of Object.entries(FIELDS)) {
+  document.querySelector(`#save-${channel}`).addEventListener('click', async () => {
+    const values = {};
+    for (const [key, selector] of Object.entries(config.inputs)) {
+      values[key] = document.querySelector(selector).value.trim();
+    }
+    await new Promise((resolve) => chrome.storage.local.set(values, resolve));
+    showSavedStatus(channel);
+    if (channel === 'ntfy') {
+      await ensureNtfyServerPermission(values.ntfyServer);
+    }
+  });
+}
+
 for (const button of document.querySelectorAll('[data-test]')) {
   button.addEventListener('click', () => {
     button.disabled = true;
@@ -112,4 +135,5 @@ for (const button of document.querySelectorAll('[data-test]')) {
 }
 
 loadState();
+loadPushSettings();
 setInterval(loadState, 1000);
