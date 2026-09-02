@@ -48,9 +48,17 @@ function loadState() {
       return;
     }
     enabledInput.checked = status.enabled !== false;
-    monitorState.textContent = status.monitorStatus.isQuestion ? '发现新题' : '监测中';
-    monitorState.dataset.question = String(status.monitorStatus.isQuestion);
     monitorContent.textContent = status.monitorStatus.summary;
+    chrome.tabs.query({ url: 'https://app.wooclap.com/*' }, (tabs) => {
+      if (chrome.runtime.lastError) return;
+      if (!tabs.length) {
+        monitorState.textContent = '未监测';
+        monitorState.dataset.question = 'none';
+      } else {
+        monitorState.textContent = status.monitorStatus.isQuestion ? '发现新题' : '监测中';
+        monitorState.dataset.question = String(status.monitorStatus.isQuestion);
+      }
+    });
     if (status.notificationDiagnostic.state === 'failed') {
       showError(status.notificationDiagnostic.message);
     } else {

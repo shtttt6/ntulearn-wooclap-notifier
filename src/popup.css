@@ -104,6 +104,14 @@ button:disabled {
   font-weight: 700;
 }
 
+.monitor-state[data-question="none"] {
+  color: #94a3b8;
+}
+
+.monitor-state[data-question="true"] {
+  color: #b91c1c;
+}
+
 .content-card {
   margin-top: 14px;
   padding: 12px;
