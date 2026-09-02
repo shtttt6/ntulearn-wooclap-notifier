@@ -10,15 +10,21 @@
       : `=?utf-8?B?${btoa(unescape(encodeURIComponent(text)))}?=`;
   }
 
-  function buildNtfyRequest({ topic, serverUrl = DEFAULT_SERVER, message = '', title = '', priority = 'high', tags = ['bell'] } = {}) {
+  function encodeBasicAuth(username, password) {
+    return `Basic ${btoa(unescape(encodeURIComponent(`${username}:${password}`)))}`;
+  }
+
+  function buildNtfyRequest({ topic, serverUrl = DEFAULT_SERVER, message = '', title = '', priority = 'high', tags = ['bell'], username = '', password = '' } = {}) {
     const cleanTopic = String(topic || '').trim();
     if (!TOPIC_PATTERN.test(cleanTopic)) return null;
     const headers = {};
+    if (username) headers.Authorization = encodeBasicAuth(username, password);
     if (title) headers['X-Title'] = encodeHeaderValue(title);
     if (priority) headers['X-Priority'] = String(priority);
     if (tags && tags.length) headers['X-Tags'] = tags.map(encodeHeaderValue).join(',');
+    const base = String(serverUrl || '').trim() || DEFAULT_SERVER;
     return {
-      url: `${String(serverUrl).replace(/\/+$/, '')}/${cleanTopic}`,
+      url: `${base.replace(/\/+$/, '')}/${cleanTopic}`,
       options: { method: 'POST', headers, body: String(message) },
     };
   }

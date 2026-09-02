@@ -1,8 +1,11 @@
 importScripts('ntfy-core.js');
+importScripts('bark-core.js');
 
 const NOTIFICATION_ICON_PATH = 'assets/notification-icon-128.png';
 const NTFY_PUSH = { title: 'WOOCLAP 有新题目', message: '打开 WOOCLAP 页面查看并作答。' };
 const NTFY_TEST_PUSH = { title: 'WOOCLAP 测试推送', message: 'ntfy 手机推送工作正常。' };
+const BARK_PUSH = { title: 'WOOCLAP 有新题目', message: '打开 WOOCLAP 页面查看并作答。' };
+const BARK_TEST_PUSH = { title: 'WOOCLAP 测试推送', message: 'Bark 手机推送工作正常。' };
 const FALLBACK_NOTIFICATION_ICON = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNQTX79HwAElwJzVt2vfAAAAABJRU5ErkJggg==';
 const notificationSources = new Map();
 const EMPTY_MONITOR_STATUS = {
@@ -50,8 +53,8 @@ function createNotification(notificationId, iconUrl, isTest, done, isFallback = 
   });
 }
 
-function sendNtfyPush(topic, { title, message }, done) {
-  const request = globalThis.WooclapNtfyCore.buildNtfyRequest({ topic, title, message });
+function sendNtfyPush({ ntfyTopic: topic, ntfyServer: serverUrl, ntfyUser: username, ntfyPass: password }, { title, message }, done) {
+  const request = globalThis.WooclapNtfyCore.buildNtfyRequest({ topic, serverUrl, username, password, title, message });
   if (!request) {
     done?.({ ok: false, message: 'ntfy 频道名无效，只能包含字母、数字、下划线和中划线。' });
     return;
@@ -63,6 +66,22 @@ function sendNtfyPush(topic, { title, message }, done) {
     })
     .catch((error) => {
       done?.({ ok: false, message: `ntfy 推送失败：${error.message}` });
+    });
+}
+
+function sendBarkPush({ barkKey: deviceKey, barkServer: serverUrl }, { title, message }, done) {
+  const request = globalThis.WooclapBarkCore.buildBarkRequest({ deviceKey, serverUrl, title, message });
+  if (!request) {
+    done?.({ ok: false, message: 'Bark Device Key 无效。' });
+    return;
+  }
+  fetch(request.url, request.options)
+    .then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      done?.({ ok: true });
+    })
+    .catch((error) => {
+      done?.({ ok: false, message: `Bark 推送失败：${error.message}` });
     });
 }
 
@@ -86,10 +105,11 @@ function getPopupStatus(done) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'new-question') {
-    chrome.storage.local.get({ enabled: true, ntfyTopic: '' }, ({ enabled, ntfyTopic }) => {
-      if (!enabled) return;
+    chrome.storage.local.get({ enabled: true, ntfyTopic: '', barkKey: '' }, (settings) => {
+      if (!settings.enabled) return;
       showNotification(sender.tab?.id, false);
-      if (ntfyTopic.trim()) sendNtfyPush(ntfyTopic, NTFY_PUSH);
+      if (settings.ntfyTopic.trim()) sendNtfyPush(settings, NTFY_PUSH);
+      if (settings.barkKey.trim()) sendBarkPush(settings, BARK_PUSH);
     });
   }
 
@@ -112,18 +132,31 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: false, message: messageText });
         return;
       }
-      chrome.storage.local.get({ ntfyTopic: '' }, ({ ntfyTopic }) => {
+      chrome.storage.local.get({ ntfyTopic: '', ntfyServer: '', ntfyUser: '', ntfyPass: '', barkKey: '', barkServer: '' }, (settings) => {
         showNotification(undefined, true, (result) => {
-          if (!ntfyTopic.trim()) {
-            sendResponse(result);
-            return;
-          }
-          sendNtfyPush(ntfyTopic, NTFY_TEST_PUSH, (push) => {
-            sendResponse({
-              ok: result.ok && push.ok,
-              message: [result.message, push.message].filter(Boolean).join('；'),
+          const messages = [result.message];
+          let ok = result.ok;
+          let pending = 1;
+          const finish = () => {
+            if (--pending === 0) sendResponse({ ok, message: messages.filter(Boolean).join('；') });
+          };
+          if (settings.ntfyTopic.trim()) {
+            pending++;
+            sendNtfyPush(settings, NTFY_TEST_PUSH, (push) => {
+              ok = ok && push.ok;
+              messages.push(push.message);
+              finish();
             });
-          });
+          }
+          if (settings.barkKey.trim()) {
+            pending++;
+            sendBarkPush(settings, BARK_TEST_PUSH, (push) => {
+              ok = ok && push.ok;
+              messages.push(push.message);
+              finish();
+            });
+          }
+          finish();
         });
       });
     });

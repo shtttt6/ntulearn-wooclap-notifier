@@ -23,10 +23,20 @@
         </label>
         <button id="test-notification" type="button">测试</button>
       </div>
-      <section class="ntfy-card">
-        <label for="ntfy-topic">手机推送频道（ntfy）</label>
+      <button id="ntfy-toggle" type="button" class="ntfy-toggle" aria-expanded="false" aria-controls="ntfy-settings">手机推送（ntfy）▸</button>
+      <section id="ntfy-settings" class="ntfy-card hidden">
+        <label for="ntfy-server">ntfy 服务器地址</label>
+        <input id="ntfy-server" type="text" placeholder="默认 https://ntfy.sh" autocomplete="off" spellcheck="false">
+        <label for="ntfy-topic">手机推送频道（Topic）</label>
         <input id="ntfy-topic" type="text" placeholder="如 wooclap-8k2m9x" autocomplete="off" spellcheck="false">
-        <p>手机安装 ntfy App 并订阅同名频道即可同步收到推送；留空则关闭。频道名等同于密码，请勿外传。</p>
+        <label for="ntfy-user">账号（自建服务器需要，可留空）</label>
+        <input id="ntfy-user" type="text" autocomplete="off" spellcheck="false">
+        <label for="ntfy-pass">密码</label>
+        <input id="ntfy-pass" type="password" autocomplete="off">
+        <p>手机安装 ntfy App 并在同一个服务器上订阅同名频道即可同步收到推送；频道名留空则关闭推送。公开服务器上频道名等同于密码，请勿外传。</p>
+        <label for="bark-key">Bark 推送（iPhone 推荐，免代理）</label>
+        <input id="bark-key" type="text" placeholder="粘贴 Bark App 复制的完整 URL 或 Device Key" autocomplete="off" spellcheck="false">
+        <p>iPhone 建议 Bark：把 App 首页复制的整条 URL 直接粘贴进来即可，自动提取 Key；留空则关闭。</p>
       </section>
       <p id="notification-result" class="error-message hidden" aria-live="polite"></p>
     </main>

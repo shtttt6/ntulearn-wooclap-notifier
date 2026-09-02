@@ -23,7 +23,7 @@
 - 🛡️ **安全与隐私**：纯本地运行，不上传任何数据，不自动答题，不读取敏感 Cookie。
 - ⚡ **稳定更新通知**：首次加载或刷新时自动建立基线；此后 WOOCLAP 页面出现新的稳定内容快照时发送一次通知，重复渲染同一状态不会重复提醒。
 - 📊 **状态面板**：点击插件图标可实时查看当前捕获的题目摘要，支持一键发送测试通知。
-- 📱 **手机同步推送（可选）**：填入 ntfy 频道名后，新题提醒会同步推送到 Android / iPhone 上的 ntfy App，浏览器关闭页面之外的任何场景都不会错过。
+- 📱 **手机同步推送（可选）**：支持 [ntfy](https://ntfy.sh/)（官方服务器或自建，Android / iOS）与 **Bark**（iPhone 推荐，国内直连免代理）两种通道，新题提醒同步推送到手机，浏览器之外也不会错过。
 
 ---
 
@@ -82,16 +82,26 @@ cd ntulearn-wooclap-notifier
 2. 保持页面在后台打开；首次加载仅建立监测基线，之后页面出现新的稳定内容时系统会自动弹窗提醒。
 3. 点击通知直接切回页面查看或作答。
 
-## 📱 手机推送（ntfy，可选）
+## 📱 手机推送（可选）
 
-扩展支持把新题通知同步推送到手机，基于免费开源的 [ntfy](https://ntfy.sh/) 服务：
+扩展支持把新题通知同步推送到手机，内置两个通道，任选或同时使用：
 
-1. 在手机上安装 ntfy App（[Android](https://play.google.com/store/apps/details?id=io.heckel.ntfy) / [iOS](https://apps.apple.com/us/app/ntfy/id1625396347)），也可以访问 [ntfy.sh](https://ntfy.sh/) 网页端订阅。
+### Bark（iPhone 推荐，免代理）
+
+1. iPhone 安装 [Bark](https://apps.apple.com/app/bark-customed-notifications/id1403753865)（免费开源，走其官方 APNs 通道，国内直连）。
+2. 打开 Bark，把首页显示的**整条 URL**（形如 `https://api.day.app/<DeviceKey>/…`）直接复制。
+3. 在扩展弹窗 → “手机推送” 面板中，把整条 URL 粘贴进 **“Bark 推送”** 栏（自动提取 Key；自建 Bark 服务器地址也会一并识别），留空则关闭。
+4. 点“测试”确认手机收到横幅。
+
+### ntfy（Android / iOS / 网页，支持自建）
+
+1. 在手机上安装 ntfy App（[Android](https://play.google.com/store/apps/details?id=io.heckel.ntfy) / [iOS](https://apps.apple.com/us/app/ntfy/id1625396347)），也可以访问网页端订阅。
 2. 在 App 中**订阅一个自定义频道**（Topic），频道名只允许字母、数字、`-`、`_`，例如 `wooclap-8k2m9x`。**频道名等同于密码**，请使用不易猜测的名字并妥善保管。
-3. 在扩展弹窗的 **“手机推送频道（ntfy）”** 中填入同一频道名，回车保存。
-4. 点击 **“测试”** 按钮，手机应同步收到推送；不填或清空频道名则完全关闭手机推送。
+3. 在扩展弹窗的“手机推送”面板中填入频道名；使用自建服务器时，把“ntfy 服务器地址”改为你的实例地址（Chrome 会弹窗请求访问授权，允许即可），开启 `auth-default-access: deny-all` 的自建服务器还需填写账号密码；服务器地址留空则使用官方 ntfy.sh。
+4. 点“测试”按钮，手机应同步收到推送。
 
-隐私说明：推送到手机时仅发送固定的提醒文案（“WOOCLAP 有新题目”），**不包含任何课程、题目或页面内容**；也可以将扩展中的服务器指向你自建的 ntfy 实例以实现完全私有（需自行修改 `src/ntfy-core.js` 中的默认服务器地址并调整 `manifest.json` 的 `host_permissions`）。
+> [!NOTE]
+> iPhone 上的 ntfy 实时推送需要自建服务器能访问 ntfy.sh（APNs 中转，配置 `upstream-base-url`）；不具备条件时建议使用 Bark。推送内容均为固定文案（“WOOCLAP 有新题目”），**不包含任何课程、题目或页面内容**。
 
 ---
 
