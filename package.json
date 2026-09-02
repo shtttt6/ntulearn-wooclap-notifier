@@ -1,6 +1,6 @@
 {
   "name": "ntulearn-wooclap-notifier",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Chrome extension that notifies you when an open WOOCLAP session shows a new answerable question.",
   "main": "src/detector-core.js",
   "scripts": {
